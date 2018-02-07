@@ -1,0 +1,5 @@
+events:
+- !!com.pakotzy.poehelper.Event
+  action: HELLO
+  hotKey: SHIFT+A
+  type: binder
