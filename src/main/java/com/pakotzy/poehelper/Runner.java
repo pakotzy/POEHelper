@@ -4,35 +4,51 @@ import com.melloware.jintellitype.JIntellitype;
 import com.sun.glass.ui.Application;
 import com.sun.glass.ui.Robot;
 import com.sun.jna.platform.win32.*;
+import javafx.application.Platform;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Runner {
+	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private final WindowSwitchHook hook = new WindowSwitchHook();
+
 	@Autowired
 	private SettingsProvider settings;
 
 	private Robot robot;
-	private WindowSwitchHook hook;
 	private Thread whTh;
+	private Map<Integer, Future<?>> tasks = new HashMap<>();
 
-	public Runner(){
-		hook = new WindowSwitchHook();
+	public Runner() {
 		whTh = new Thread(hook);
 		whTh.start();
 	}
 
 	public void run(int id) {
 		if (robot == null) {
-			robot = Application.GetApplication().createRobot();
+			Platform.runLater(() -> robot = Application.GetApplication().createRobot());
 		}
+
 		Event event = settings.getEvent(id);
-		System.out.println("Running: " + event.getAction());
+
+//		Check if task is already running, if so interrupt
+		Future<?> future = tasks.get(id);
+		if (future != null && future.cancel(true)) {
+			return;
+		}
+
 		switch (event.getType()) {
 			case "binder":
-				binderRun(event);
+				future = executor.submit(() -> binderRun(event));
 				break;
 			case "writer":
 				writerRun(event);
@@ -40,14 +56,32 @@ public class Runner {
 			default:
 				System.out.println("Sorry, not supported yet!");
 		}
+		tasks.put(id, future);
 	}
 
 	private void binderRun(Event event) {
-		String[] keys = event.getAction().split("");
-		for (String key : keys) {
-			robot.keyPress(key.charAt(0));
-			robot.keyRelease(key.charAt(0));
+		int delay = 0;
+		String[] keys;
+		int pos = event.getAction().indexOf(";");
+		if (pos != -1) {
+			delay = Integer.parseInt(event.getAction().substring(pos + 1));
+			keys = event.getAction().substring(0, pos).split("");
+		} else {
+			keys = event.getAction().split("");
 		}
+		do {
+			for (String key : keys) {
+				Platform.runLater(() -> {
+					robot.keyPress(key.charAt(0));
+					robot.keyRelease(key.charAt(0));
+				});
+			}
+			try {
+				TimeUnit.SECONDS.sleep(delay);
+			} catch (InterruptedException e) {
+				break;
+			}
+		} while (delay != 0);
 	}
 
 	private void writerRun(Event event) {
@@ -60,6 +94,7 @@ public class Runner {
 		if (robot != null) {
 			robot.destroy();
 		}
+		executor.shutdownNow();
 		whTh.interrupt();
 		whTh = null;
 	}
@@ -92,22 +127,23 @@ public class Runner {
 
 		@Override
 		public void run() {
-			String windowClass = new String("wshWindow");
+			String windowClass = "wshWindow";
 			WinDef.HMODULE hInst = kernel32.GetModuleHandle("");
 			WinUser.WNDCLASSEX wClass = new WinUser.WNDCLASSEX();
 			wClass.hInstance = hInst;
 			wClass.lpfnWndProc = WindowSwitchHook.this;
 			wClass.lpszClassName = windowClass;
 			user32.RegisterClassEx(wClass);
-			hwnd = user32.CreateWindowEx(0, windowClass, "Dummy message catcher", 0, 0, 0, 0, 0, null, null, hInst, null);
+			hwnd = user32.CreateWindowEx(0, windowClass, "Dummy message catcher", 0, 0, 0, 0, 0, null, null, hInst,
+					null);
 
 			if (!isHooked) {
-				wsHook = user32.SetWinEventHook(3,3, kernel32.GetModuleHandle(null), wsHookP, 0, 0, 0);
+				wsHook = user32.SetWinEventHook(3, 3, kernel32.GetModuleHandle(null), wsHookP, 0, 0, 0);
 				isHooked = true;
 			}
 
 			WinUser.MSG msg = new WinUser.MSG();
-			while (user32.GetMessage(msg, hwnd, 0, 0) != 0) {}
+			while (user32.GetMessage(msg, hwnd, 0, 0) != 0);
 			user32.UnregisterClass(windowClass, hInst);
 			user32.DestroyWindow(hwnd);
 		}

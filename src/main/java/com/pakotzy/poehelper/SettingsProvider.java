@@ -2,11 +2,15 @@ package com.pakotzy.poehelper;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,7 +43,7 @@ public class SettingsProvider {
 	@PostConstruct
 	public void loadCustomConfig() {
 		if (Files.exists(configPath)) {
-			try (BufferedReader reader = Files.newBufferedReader(configPath)){
+			try (BufferedReader reader = Files.newBufferedReader(configPath)) {
 				Yaml yaml = new Yaml();
 				events = yaml.load(reader);
 			} catch (IOException e) {
@@ -58,7 +62,7 @@ public class SettingsProvider {
 
 		try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
 			Yaml yaml = new Yaml();
-			writer.append(yaml.dump(events));
+			writer.append(yaml.dumpAs(events, Tag.SEQ, DumperOptions.FlowStyle.BLOCK));
 		}
 	}
 }

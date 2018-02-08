@@ -5,10 +5,7 @@ import com.melloware.jintellitype.JIntellitype;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
@@ -16,18 +13,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @FXMLController
-public class MainController implements HotkeyListener{
+public class MainController implements HotkeyListener {
 	@Autowired
 	private SettingsProvider settings;
 	@Autowired
 	private Runner runner;
-
 	private Map<String, TextField> nodes = new HashMap<>();
 
 	// Root
@@ -54,14 +48,12 @@ public class MainController implements HotkeyListener{
 
 			TextField keyField = new TextField(event.getHotKey());
 			keyField.setId(event.getType() + i + "KeyField");
-			keyField.setOnKeyPressed((e) -> onKeyPressed(e));
+			keyField.setOnKeyPressed(this::onKeyPressed);
 			keyField.setEditable(false);
-			keyField.setPrefWidth(100);
 			nodes.put(keyField.getId(), keyField);
 
 			TextField actionField = new TextField(event.getAction());
 			actionField.setId(event.getType() + i + "ActionField");
-			actionField.setPrefWidth(100);
 			nodes.put(actionField.getId(), actionField);
 
 			hBox.getChildren().addAll(keyField, actionField);
@@ -85,7 +77,7 @@ public class MainController implements HotkeyListener{
 		for (int i = 0; i < settings.getEventsSize(); i++) {
 			event = settings.getEvent(i);
 			key = nodes.get(event.getType() + i + "KeyField");
-			action = nodes.get(event.getType() + i +  "ActionField");
+			action = nodes.get(event.getType() + i + "ActionField");
 
 			event.setHotKey(key.getText());
 			event.setAction(action.getText().toUpperCase());
@@ -94,6 +86,6 @@ public class MainController implements HotkeyListener{
 
 	@Override
 	public void onHotKey(int hkIdentifier) {
-		Platform.runLater(() -> runner.run(hkIdentifier));
+		runner.run(hkIdentifier);
 	}
 }

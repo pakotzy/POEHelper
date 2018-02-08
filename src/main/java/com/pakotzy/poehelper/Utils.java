@@ -4,8 +4,6 @@ import com.sun.jna.Native;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import javafx.scene.Node;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
@@ -40,7 +38,7 @@ public class Utils {
 
 	//	Convert shortcut modifiers to human readable String format
 	public static String getShortcutString(KeyEvent keyEvent) {
-		List result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 
 		if (keyEvent.isAltDown()) result.add("ALT");
 		if (keyEvent.isControlDown()) result.add("CTRL");
@@ -52,6 +50,7 @@ public class Utils {
 
 	/**
 	 * Check if window with given name is active
+	 *
 	 * @param windowName The name of the Window to look for
 	 * @return true if window with given name is currently active
 	 */
@@ -65,7 +64,8 @@ public class Utils {
 
 	/**
 	 * Check if window with given windowName exists
-	 * @param windowName
+	 *
+	 * @param windowName name of the window
 	 * @return true if window with given name exists
 	 */
 	public static boolean isExists(String windowName) {
@@ -73,7 +73,7 @@ public class Utils {
 			char[] buffer = new char[MAX_TITLE_LENGTH];
 			user32.GetWindowText(hWnd, buffer, MAX_TITLE_LENGTH);
 
-			return Native.toString(buffer).equals(windowName) ? false : true;
+			return !Native.toString(buffer).equals(windowName);
 		}, null);
 	}
 

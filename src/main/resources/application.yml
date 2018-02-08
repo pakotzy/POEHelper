@@ -1,5 +1,9 @@
 events:
 - !!com.pakotzy.poehelper.Event
-  action: HELLO
+  action: QERT;4
   hotKey: SHIFT+A
+  type: binder
+- !!com.pakotzy.poehelper.Event
+  action: YOLO
+  hotKey: SHIFT+S
   type: binder

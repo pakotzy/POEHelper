@@ -12,7 +12,6 @@ import java.io.IOException;
 
 @SpringBootApplication
 public class PoeHelperApplication extends AbstractJavaFxApplicationSupport {
-
 	public static void main(String[] args) {
 		// Check environment
 		if (loadDll())
@@ -35,15 +34,8 @@ public class PoeHelperApplication extends AbstractJavaFxApplicationSupport {
 			e.printStackTrace();
 		}
 
-		if (!JIntellitype.isJIntellitypeSupported()) {
-			return false;
-		}
+		return JIntellitype.isJIntellitypeSupported() && !JIntellitype.checkInstanceAlreadyRunning("POEHelper");
 
-		if (JIntellitype.checkInstanceAlreadyRunning("POEHelper")) {
-			return false;
-		}
-
-		return true;
 	}
 
 	@PreDestroy
