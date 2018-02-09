@@ -3,14 +3,16 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox fx:id="root" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pakotzy.poehelper.MainController">
-	<children>
-		<TitledPane fx:id="binderTitledPane" animated="false" expanded="false" text="%binder_pane">
-			<content>
-				<VBox fx:id="binderVBox" />
-			</content>
-		</TitledPane>
-		<Button mnemonicParsing="false" onMouseClicked="#onSaveClick" text="%save_button" />
-	</children>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="com.pakotzy.poehelper.MainController">
+	<TitledPane fx:id="binderTitledPane" animated="false" expanded="false" text="%binder_pane">
+		<VBox fx:id="binderVBox"/>
+	</TitledPane>
+	<TitledPane fx:id="writerTitledPane" animated="false" expanded="false" text="%writer_pane">
+		<VBox fx:id="writerVBox"/>
+	</TitledPane>
+	<TitledPane fx:id="customTitledPane" animated="false" expanded="false" text="%custom_pane">
+		<VBox fx:id="customVBox"/>
+	</TitledPane>
+	<Button mnemonicParsing="false" onMouseClicked="#onSaveClick" text="%save_button"/>
 </VBox>

@@ -34,6 +34,18 @@ public class MainController implements HotkeyListener {
 	@FXML
 	private VBox binderVBox;
 
+	// Writer
+	@FXML
+	private TitledPane writerTitledPane;
+	@FXML
+	private VBox writerVBox;
+
+	// Custom
+	@FXML
+	private TitledPane customTitledPane;
+	@FXML
+	private VBox customVBox;
+
 	// Populate UI fields with current values from the save file and register hot key handlers
 	public void initialize() {
 		JIntellitype.getInstance().addHotKeyListener(this);
@@ -63,6 +75,12 @@ public class MainController implements HotkeyListener {
 		binderTitledPane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
 			Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
 		});
+		writerTitledPane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
+			Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
+		});
+		customTitledPane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
+			Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
+		});
 	}
 
 	public void onKeyPressed(KeyEvent keyEvent) {
@@ -80,7 +98,7 @@ public class MainController implements HotkeyListener {
 			action = nodes.get(event.getType() + i + "ActionField");
 
 			event.setHotKey(key.getText());
-			event.setAction(action.getText().toUpperCase());
+			event.setAction(action.getText());
 		}
 	}
 

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +39,8 @@ public class Runner {
 			Platform.runLater(() -> robot = Application.GetApplication().createRobot());
 		}
 
+		Platform.runLater(() -> robot.keyRelease(KeyEvent.VK_SHIFT));
+
 		Event event = settings.getEvent(id);
 
 //		Check if task is already running, if so interrupt
@@ -53,6 +56,9 @@ public class Runner {
 			case "writer":
 				writerRun(event);
 				break;
+			case "custom":
+				customRun(event);
+				break;
 			default:
 				System.out.println("Sorry, not supported yet!");
 		}
@@ -61,21 +67,21 @@ public class Runner {
 
 	private void binderRun(Event event) {
 		int delay = 0;
-		String[] keys;
+		char[] keys;
 		int pos = event.getAction().indexOf(";");
 		if (pos != -1) {
 			delay = Integer.parseInt(event.getAction().substring(pos + 1));
-			keys = event.getAction().substring(0, pos).split("");
+			keys = event.getAction().substring(0, pos).toCharArray();
 		} else {
-			keys = event.getAction().split("");
+			keys = event.getAction().toCharArray();
 		}
 		do {
-			for (String key : keys) {
-				Platform.runLater(() -> {
-					robot.keyPress(key.charAt(0));
-					robot.keyRelease(key.charAt(0));
-				});
-			}
+			Platform.runLater(() -> {
+				for (char key : keys) {
+					robot.keyPress(Character.toUpperCase(key));
+					robot.keyRelease(Character.toUpperCase(key));
+				}
+			});
 			try {
 				TimeUnit.SECONDS.sleep(delay);
 			} catch (InterruptedException e) {
@@ -85,7 +91,50 @@ public class Runner {
 	}
 
 	private void writerRun(Event event) {
+		Platform.runLater(() -> {
+			Utils.writeToClipboard(event.getAction());
 
+			robot.keyPress(KeyEvent.VK_ENTER);
+			robot.keyRelease(KeyEvent.VK_ENTER);
+
+			robot.keyPress(KeyEvent.VK_CONTROL);
+			robot.keyPress(KeyEvent.VK_V);
+			robot.keyRelease(KeyEvent.VK_V);
+			robot.keyRelease(KeyEvent.VK_CONTROL);
+
+			robot.keyPress(KeyEvent.VK_ENTER);
+			robot.keyRelease(KeyEvent.VK_ENTER);
+		});
+
+//		char[] keys = event.getAction().toCharArray();
+//
+//		Platform.runLater(() -> {
+//			robot.keyPress(KeyEvent.VK_ENTER);
+//			robot.keyRelease(KeyEvent.VK_ENTER);
+//
+//			for (char key : keys) {
+//				Character buffer = Utils.isSpecial(key);
+//				if (Character.isUpperCase(key) || buffer != null) {
+//					if (buffer != null) {
+//						key = buffer;
+//					}
+//					robot.keyPress(KeyEvent.VK_SHIFT);
+//				}
+//
+//				robot.keyPress(KeyEvent.getExtendedKeyCodeForChar(key));
+//				robot.keyRelease(KeyEvent.getExtendedKeyCodeForChar(key));
+//
+//				if (Character.isUpperCase(key) || buffer != null) {
+//					robot.keyRelease(KeyEvent.VK_SHIFT);
+//				}
+//			}
+//
+//			robot.keyPress(KeyEvent.VK_ENTER);
+//			robot.keyRelease(KeyEvent.VK_ENTER);
+//		});
+	}
+
+	private void customRun(Event event) {
 	}
 
 	@PreDestroy
@@ -143,7 +192,7 @@ public class Runner {
 			}
 
 			WinUser.MSG msg = new WinUser.MSG();
-			while (user32.GetMessage(msg, hwnd, 0, 0) != 0);
+			while (user32.GetMessage(msg, hwnd, 0, 0) != 0) ;
 			user32.UnregisterClass(windowClass, hInst);
 			user32.DestroyWindow(hwnd);
 		}

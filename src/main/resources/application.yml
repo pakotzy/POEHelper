@@ -4,6 +4,6 @@ events:
   hotKey: SHIFT+A
   type: binder
 - !!com.pakotzy.poehelper.Event
-  action: YOLO
+  action: /afk Wife's home. On duty!
   hotKey: SHIFT+S
-  type: binder
+  type: writer
