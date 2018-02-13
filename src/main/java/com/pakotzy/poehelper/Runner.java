@@ -218,13 +218,15 @@ public class Runner {
 
 		private void registerHotkeys() {
 			for (int i = 0; i < settings.getEventsSize(); i++) {
-				JIntellitype.getInstance().registerHotKey(i, settings.getEvent(i).getHotKey());
+				if (settings.getEvent(i).getEnabled())
+					JIntellitype.getInstance().registerHotKey(i, settings.getEvent(i).getHotKey());
 			}
 		}
 
 		private void unregisterHotkeys() {
 			for (int i = 0; i < settings.getEventsSize(); i++) {
-				JIntellitype.getInstance().unregisterHotKey(i);
+				if (settings.getEvent(i).getEnabled())
+					JIntellitype.getInstance().unregisterHotKey(i);
 			}
 		}
 	}

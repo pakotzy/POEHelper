@@ -61,7 +61,7 @@ public class Utils {
 		if (keyEvent.isShiftDown()) result.add("SHIFT");
 		result.add(keyEvent.getText().toUpperCase());
 
-		return String.join(" + ", result);
+		return String.join("+", result);
 	}
 
 	/**
