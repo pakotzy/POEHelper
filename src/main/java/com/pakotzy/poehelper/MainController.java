@@ -13,36 +13,35 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @FXMLController
 public class MainController implements HotkeyListener {
-	@Autowired
-	private SettingsProvider settings;
-	@Autowired
-	private Runner runner;
-
 	// Root
 	@FXML
 	private Parent root;
-
 	// Binder
 	@FXML
 	private TitledPane binderTitledPane;
 	@FXML
 	private VBox binderVBox;
-
 	// Writer
 	@FXML
 	private TitledPane writerTitledPane;
 	@FXML
 	private VBox writerVBox;
-
 	// Custom
 	@FXML
 	private TitledPane customTitledPane;
 	@FXML
 	private VBox customVBox;
+
+	private SettingsProvider settings;
+	private Runner runner;
+
+	public MainController(SettingsProvider settings, Runner runner) {
+		this.settings = settings;
+		this.runner = runner;
+	}
 
 	// Populate UI fields with current values from the save file and register hot key handlers
 	public void initialize() {

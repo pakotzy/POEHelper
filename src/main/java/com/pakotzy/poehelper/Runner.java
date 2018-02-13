@@ -5,7 +5,6 @@ import com.sun.glass.ui.Application;
 import com.sun.glass.ui.Robot;
 import com.sun.jna.platform.win32.*;
 import javafx.application.Platform;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -22,14 +21,14 @@ public class Runner {
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final WindowSwitchHook hook = new WindowSwitchHook();
 
-	@Autowired
 	private SettingsProvider settings;
 
 	private Robot robot;
 	private Thread whTh;
 	private Map<Integer, Future<?>> tasks = new HashMap<>();
 
-	public Runner() {
+	public Runner(SettingsProvider settings) {
+		this.settings = settings;
 		whTh = new Thread(hook);
 		whTh.start();
 	}

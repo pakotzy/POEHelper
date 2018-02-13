@@ -28,10 +28,6 @@ public class SettingsProvider {
 		return events;
 	}
 
-	public void setEvents(List<Event> events) {
-		this.events = events;
-	}
-
 	public Event getEvent(int eventId) {
 		return events.get(eventId);
 	}
@@ -39,6 +35,8 @@ public class SettingsProvider {
 	public int getEventsSize() {
 		return events.size();
 	}
+
+	public SettingsProvider(List<Event> events) {}
 
 	@PostConstruct
 	public void loadCustomConfig() {

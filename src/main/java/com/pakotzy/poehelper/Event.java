@@ -1,16 +1,21 @@
 package com.pakotzy.poehelper;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component
+@Scope("prototype")
 public class Event {
 	private String hotKey;
 	private String type;
 	private String action;
-	private Boolean enabled;
+	private boolean enabled;
 
-	public Boolean getEnabled() {
+	public boolean getEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(Boolean enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
