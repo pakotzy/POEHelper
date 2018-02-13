@@ -2,8 +2,10 @@ events:
 - !!com.pakotzy.poehelper.Event
   action: QERT;4
   hotKey: SHIFT+A
+  enabled: yes
   type: binder
 - !!com.pakotzy.poehelper.Event
   action: /afk Wife's home. On duty!
   hotKey: SHIFT+S
+  enabled: no
   type: writer

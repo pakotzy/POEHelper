@@ -4,8 +4,11 @@ import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
@@ -22,7 +25,7 @@ public class MainController implements HotkeyListener {
 	private SettingsProvider settings;
 	@Autowired
 	private Runner runner;
-	private Map<String, TextField> nodes = new HashMap<>();
+	private Map<String, Control> nodes = new HashMap<>();
 
 	// Root
 	@FXML
@@ -62,25 +65,44 @@ public class MainController implements HotkeyListener {
 			keyField.setId(event.getType() + i + "KeyField");
 			keyField.setOnKeyPressed(this::onKeyPressed);
 			keyField.setEditable(false);
+			keyField.textProperty().addListener(keyChangeListener(event));
 			nodes.put(keyField.getId(), keyField);
 
 			TextField actionField = new TextField(event.getAction());
 			actionField.setId(event.getType() + i + "ActionField");
+			actionField.textProperty().addListener(actionChangeListener(event));
 			nodes.put(actionField.getId(), actionField);
 
-			hBox.getChildren().addAll(keyField, actionField);
+			CheckBox enabledBox = new CheckBox();
+			actionField.setId(event.getType() + i + "EnabledBox");
+			enabledBox.setIndeterminate(false);
+			enabledBox.setSelected(event.getEnabled());
+			enabledBox.selectedProperty().addListener(enabledChangeListener(event));
+			nodes.put(enabledBox.getId(), enabledBox);
+
+			hBox.getChildren().addAll(keyField, actionField, enabledBox);
 			vBox.getChildren().add(hBox);
 		}
 
-		binderTitledPane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
-			Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
-		});
-		writerTitledPane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
-			Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
-		});
-		customTitledPane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
-			Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
-		});
+		binderTitledPane.expandedProperty().addListener(expandedChangeListener());
+		writerTitledPane.expandedProperty().addListener(expandedChangeListener());
+		customTitledPane.expandedProperty().addListener(expandedChangeListener());
+	}
+
+	private ChangeListener<String> keyChangeListener(Event event) {
+		return (observable, oldValue, newValue) -> event.setHotKey(newValue);
+	}
+
+	private ChangeListener<String> actionChangeListener(Event event) {
+		return (observable, oldValue, newValue) -> event.setAction(newValue);
+	}
+
+	private ChangeListener<Boolean> enabledChangeListener(Event event) {
+		return (observable, oldValue, newValue) -> event.setEnabled(newValue);
+	}
+
+	private ChangeListener<Boolean> expandedChangeListener() {
+		return (obs, wasExpanded, isNowExpanded) -> Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
 	}
 
 	public void onKeyPressed(KeyEvent keyEvent) {
@@ -92,13 +114,16 @@ public class MainController implements HotkeyListener {
 		Event event;
 		TextField key;
 		TextField action;
+		CheckBox enabled;
 		for (int i = 0; i < settings.getEventsSize(); i++) {
 			event = settings.getEvent(i);
-			key = nodes.get(event.getType() + i + "KeyField");
-			action = nodes.get(event.getType() + i + "ActionField");
+			key = (TextField) nodes.get(event.getType() + i + "KeyField");
+			action = (TextField) nodes.get(event.getType() + i + "ActionField");
+			enabled = (CheckBox) nodes.get(event.getType() + i + "EnabledBox");
 
 			event.setHotKey(key.getText());
 			event.setAction(action.getText());
+			event.setEnabled(enabled.isSelected());
 		}
 	}
 
