@@ -167,10 +167,10 @@ public class Runner {
 					wStatus = true;
 				}
 			} else {
-//				if (wStatus) {
-//					unregisterHotkeys();
-//					wStatus = false;
-//				}
+				if (wStatus) {
+					unregisterHotkeys();
+					wStatus = false;
+				}
 			}
 		};
 
@@ -218,15 +218,13 @@ public class Runner {
 
 		private void registerHotkeys() {
 			for (int i = 0; i < settings.getEventsSize(); i++) {
-				if (settings.getEvent(i).getEnabled())
-					JIntellitype.getInstance().registerHotKey(i, settings.getEvent(i).getHotKey());
+				JIntellitype.getInstance().registerHotKey(i, settings.getEvent(i).getHotKey());
 			}
 		}
 
 		private void unregisterHotkeys() {
 			for (int i = 0; i < settings.getEventsSize(); i++) {
-				if (settings.getEvent(i).getEnabled())
-					JIntellitype.getInstance().unregisterHotKey(i);
+				JIntellitype.getInstance().unregisterHotKey(i);
 			}
 		}
 	}
