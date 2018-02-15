@@ -32,6 +32,11 @@ public class SettingsProvider {
 		return events.get(eventId);
 	}
 
+	public int addEvent(Event event) {
+		events.add(event);
+		return getEventsSize() - 1;
+	}
+
 	public int getEventsSize() {
 		return events.size();
 	}

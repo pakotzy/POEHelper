@@ -5,12 +5,15 @@ import com.melloware.jintellitype.JIntellitype;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -50,34 +53,46 @@ public class MainController implements HotkeyListener {
 		Event event;
 		for (int i = 0; i < settings.getEventsSize(); i++) {
 			event = settings.getEvent(i);
-
 			VBox vBox = (VBox) Utils.findField(this, event.getType(), "VBox");
-			HBox hBox = new HBox();
-			hBox.getStyleClass().add("hbox");
-
-			TextField keyField = new TextField(event.getHotKey());
-			keyField.setId(event.getType() + i + "KeyField");
-			keyField.setOnKeyPressed(this::onKeyPressed);
-			keyField.setEditable(false);
-			keyField.textProperty().addListener(keyChangeListener(event));
-
-			TextField actionField = new TextField(event.getAction());
-			actionField.setId(event.getType() + i + "ActionField");
-			actionField.textProperty().addListener(actionChangeListener(event));
-
-			CheckBox enabledBox = new CheckBox();
-			actionField.setId(event.getType() + i + "EnabledBox");
-			enabledBox.setIndeterminate(false);
-			enabledBox.setSelected(event.getEnabled());
-			enabledBox.selectedProperty().addListener(enabledChangeListener(event));
-
-			hBox.getChildren().addAll(keyField, actionField, enabledBox);
-			vBox.getChildren().add(hBox);
+			addEvent(event, i, vBox);
 		}
 
 		binderTitledPane.expandedProperty().addListener(expandedChangeListener());
 		writerTitledPane.expandedProperty().addListener(expandedChangeListener());
 		customTitledPane.expandedProperty().addListener(expandedChangeListener());
+	}
+
+	private void addEvent(Event event, int i, VBox vBox) {
+		HBox hBox = new HBox();
+		hBox.setId(event.getType() + "HBox" + i);
+		hBox.getStyleClass().add("hbox");
+
+		TextField keyField = new TextField(event.getHotKey());
+		keyField.setId(event.getType() + "KeyField" + i);
+		keyField.setOnKeyPressed(this::onKeyPressed);
+		keyField.setEditable(false);
+		keyField.textProperty().addListener(keyChangeListener(event));
+
+		TextField actionField = new TextField(event.getAction());
+		actionField.setId(event.getType() + "ActionField" + i);
+		actionField.textProperty().addListener(actionChangeListener(event));
+
+		CheckBox enabledBox = new CheckBox();
+		actionField.setId(event.getType() + "EnabledBox" + i);
+		enabledBox.setIndeterminate(false);
+		enabledBox.setSelected(event.getEnabled());
+		enabledBox.selectedProperty().addListener(enabledChangeListener(event));
+
+		Button removeButton = new Button("X");
+		removeButton.setId(event.getType() + "RemoveButton" + i);
+		removeButton.setOnMouseClicked(removeClickListener(event, vBox, hBox));
+
+		hBox.getChildren().addAll(keyField, actionField, enabledBox, removeButton);
+		vBox.getChildren().add(vBox.getChildren().size() - 1, hBox);
+	}
+
+	private ChangeListener<Boolean> expandedChangeListener() {
+		return (obs, wasExpanded, isNowExpanded) -> Platform.runLater(this::resizeWindow);
 	}
 
 	private ChangeListener<String> keyChangeListener(Event event) {
@@ -92,13 +107,32 @@ public class MainController implements HotkeyListener {
 		return (observable, oldValue, newValue) -> event.setEnabled(newValue);
 	}
 
-	private ChangeListener<Boolean> expandedChangeListener() {
-		return (obs, wasExpanded, isNowExpanded) -> Platform.runLater(() -> root.getScene().getWindow().sizeToScene());
+	private EventHandler<MouseEvent> removeClickListener(Event event, VBox vBox, HBox hBox) {
+		return e -> {
+			vBox.getChildren().remove(hBox);
+			settings.getEvents().remove(event);
+			resizeWindow();
+		};
+	}
+
+	private void resizeWindow() {
+		root.getScene().getWindow().sizeToScene();
 	}
 
 	public void onKeyPressed(KeyEvent keyEvent) {
 		String combination = Utils.getShortcutString(keyEvent);
 		((TextField) keyEvent.getSource()).setText(combination);
+	}
+
+	public void onAddClick(MouseEvent mouseEvent) {
+		Button button = (Button) mouseEvent.getSource();
+		String key = button.getId().substring(0, 6);
+		VBox vBox = (VBox) Utils.findField(this, key, "VBox");
+		Event event = new Event();
+		event.setType(key);
+		int id = settings.addEvent(event);
+		addEvent(event, id, vBox);
+		resizeWindow();
 	}
 
 	@Override

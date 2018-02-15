@@ -1,6 +1,7 @@
 .hbox {
 	-fx-spacing: 6;
 }
-.text-field {
-	-fx-font-size: 14;
+
+.check-box > .box {
+	-fx-padding: 8;
 }
