@@ -104,33 +104,6 @@ public class Runner {
 			robot.keyPress(KeyEvent.VK_ENTER);
 			robot.keyRelease(KeyEvent.VK_ENTER);
 		});
-
-//		char[] keys = event.getAction().toCharArray();
-//
-//		Platform.runLater(() -> {
-//			robot.keyPress(KeyEvent.VK_ENTER);
-//			robot.keyRelease(KeyEvent.VK_ENTER);
-//
-//			for (char key : keys) {
-//				Character buffer = Utils.isSpecial(key);
-//				if (Character.isUpperCase(key) || buffer != null) {
-//					if (buffer != null) {
-//						key = buffer;
-//					}
-//					robot.keyPress(KeyEvent.VK_SHIFT);
-//				}
-//
-//				robot.keyPress(KeyEvent.getExtendedKeyCodeForChar(key));
-//				robot.keyRelease(KeyEvent.getExtendedKeyCodeForChar(key));
-//
-//				if (Character.isUpperCase(key) || buffer != null) {
-//					robot.keyRelease(KeyEvent.VK_SHIFT);
-//				}
-//			}
-//
-//			robot.keyPress(KeyEvent.VK_ENTER);
-//			robot.keyRelease(KeyEvent.VK_ENTER);
-//		});
 	}
 
 	private void customRun(Event event) {

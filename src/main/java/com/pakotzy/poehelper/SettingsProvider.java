@@ -24,6 +24,8 @@ public class SettingsProvider {
 
 	private List<Event> events = new ArrayList<>();
 
+	public SettingsProvider(List<Event> events) {}
+
 	public List<Event> getEvents() {
 		return events;
 	}
@@ -40,8 +42,6 @@ public class SettingsProvider {
 	public int getEventsSize() {
 		return events.size();
 	}
-
-	public SettingsProvider(List<Event> events) {}
 
 	@PostConstruct
 	public void loadCustomConfig() {

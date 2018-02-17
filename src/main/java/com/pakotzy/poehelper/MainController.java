@@ -54,7 +54,7 @@ public class MainController implements HotkeyListener {
 		for (int i = 0; i < settings.getEventsSize(); i++) {
 			event = settings.getEvent(i);
 			VBox vBox = (VBox) Utils.findField(this, event.getType(), "VBox");
-			addEvent(event, i, vBox);
+			showEvent(event, i, vBox);
 		}
 
 		binderTitledPane.expandedProperty().addListener(expandedChangeListener());
@@ -62,7 +62,7 @@ public class MainController implements HotkeyListener {
 		customTitledPane.expandedProperty().addListener(expandedChangeListener());
 	}
 
-	private void addEvent(Event event, int i, VBox vBox) {
+	private void showEvent(Event event, int i, VBox vBox) {
 		HBox hBox = new HBox();
 		hBox.setId(event.getType() + "HBox" + i);
 		hBox.getStyleClass().add("hbox");
@@ -85,7 +85,7 @@ public class MainController implements HotkeyListener {
 
 		Button removeButton = new Button("X");
 		removeButton.setId(event.getType() + "RemoveButton" + i);
-		removeButton.setOnMouseClicked(removeClickListener(event, vBox, hBox));
+		removeButton.setOnMouseClicked(onRemoveCLick(event, vBox, hBox));
 
 		hBox.getChildren().addAll(keyField, actionField, enabledBox, removeButton);
 		vBox.getChildren().add(vBox.getChildren().size() - 1, hBox);
@@ -107,7 +107,7 @@ public class MainController implements HotkeyListener {
 		return (observable, oldValue, newValue) -> event.setEnabled(newValue);
 	}
 
-	private EventHandler<MouseEvent> removeClickListener(Event event, VBox vBox, HBox hBox) {
+	private EventHandler<MouseEvent> onRemoveCLick(Event event, VBox vBox, HBox hBox) {
 		return e -> {
 			vBox.getChildren().remove(hBox);
 			settings.getEvents().remove(event);
@@ -119,8 +119,12 @@ public class MainController implements HotkeyListener {
 		root.getScene().getWindow().sizeToScene();
 	}
 
-	public void onKeyPressed(KeyEvent keyEvent) {
+	private void onKeyPressed(KeyEvent keyEvent) {
 		String combination = Utils.getShortcutString(keyEvent);
+
+		if (keyEvent.getCode().getName().equals("Backspace"))
+			combination = "";
+
 		((TextField) keyEvent.getSource()).setText(combination);
 	}
 
@@ -131,7 +135,7 @@ public class MainController implements HotkeyListener {
 		Event event = new Event();
 		event.setType(key);
 		int id = settings.addEvent(event);
-		addEvent(event, id, vBox);
+		showEvent(event, id, vBox);
 		resizeWindow();
 	}
 
