@@ -40,7 +40,6 @@ public class Utils {
 
 	//	Convert shortcut modifiers to human readable String format
 	public static String getShortcutString(KeyEvent keyEvent) {
-		System.out.println(keyEvent.getText() + ";" + keyEvent.getCode().getName());
 		List<String> result = new ArrayList<>();
 
 		if (keyEvent.isAltDown()) result.add("Alt");

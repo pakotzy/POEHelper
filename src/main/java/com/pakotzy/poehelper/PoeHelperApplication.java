@@ -1,6 +1,5 @@
 package com.pakotzy.poehelper;
 
-import com.melloware.jintellitype.GraphicalEnvironment;
 import com.melloware.jintellitype.JIntellitype;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,7 +34,7 @@ public class PoeHelperApplication extends AbstractJavaFxApplicationSupport {
 			e.printStackTrace();
 		}
 
-		JIntellitype.setGraphicalEnvirnoment(GraphicalEnvironment.JAVAFX);
+		JIntellitype.enableJavaFX();
 
 		return JIntellitype.isJIntellitypeSupported() && !JIntellitype.checkInstanceAlreadyRunning("POEHelper");
 
