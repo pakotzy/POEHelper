@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" stylesheets="global.css" xmlns="http://javafx.com/javafx/8.0.121"
-      fx:controller="com.pakotzy.poehelper.MainController">
-	<TitledPane fx:id="binderTitledPane" animated="false" expanded="false" text="%binder_pane">
-		<VBox fx:id="binderVBox">
-			<Button fx:id="binderButton" onMouseClicked="#onAddClick" text="%add_button"/>
-		</VBox>
-	</TitledPane>
-	<TitledPane fx:id="writerTitledPane" animated="false" expanded="false" text="%writer_pane">
-		<VBox fx:id="writerVBox">
-			<Button fx:id="writerButton" onMouseClicked="#onAddClick" text="%add_button"/>
-		</VBox>
-	</TitledPane>
-	<TitledPane fx:id="customTitledPane" animated="false" expanded="false" text="%custom_pane">
-		<VBox fx:id="customVBox"/>
-	</TitledPane>
-</VBox>
+      fx:controller="com.pakotzy.poehelper.MainController"/>

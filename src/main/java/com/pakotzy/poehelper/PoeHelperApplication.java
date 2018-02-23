@@ -9,9 +9,12 @@ import org.springframework.core.io.ResourceLoader;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.ArrayList;
 
 @SpringBootApplication
 public class PoeHelperApplication extends AbstractJavaFxApplicationSupport {
+	public static final ArrayList<String> eventHeap = new ArrayList<>();
+
 	public static void main(String[] args) {
 		// Check environment
 		if (loadDll())
@@ -33,8 +36,6 @@ public class PoeHelperApplication extends AbstractJavaFxApplicationSupport {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		JIntellitype.enableJavaFX();
 
 		return JIntellitype.isJIntellitypeSupported() && !JIntellitype.checkInstanceAlreadyRunning("POEHelper");
 

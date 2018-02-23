@@ -9,115 +9,47 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class Runner {
+	public static final AtomicReference<Robot> ROBOT = new AtomicReference<>();
+
+	static {
+		Platform.runLater(() -> ROBOT.set(Application.GetApplication().createRobot()));
+	}
+
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final WindowSwitchHook hook = new WindowSwitchHook();
 
 	private SettingsProvider settings;
-
-	private Robot robot;
 	private Thread whTh;
-	private Map<Integer, Future<?>> tasks = new HashMap<>();
 
 	public Runner(SettingsProvider settings) {
+		Platform.runLater(() -> ROBOT.set(Application.GetApplication().createRobot()));
 		this.settings = settings;
+
 		whTh = new Thread(hook);
 		whTh.start();
 	}
 
 	public void run(int id) {
-		if (robot == null) {
-			Platform.runLater(() -> robot = Application.GetApplication().createRobot());
-		}
+		Platform.runLater(() -> ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
 
-		Platform.runLater(() -> robot.keyRelease(KeyEvent.VK_SHIFT));
-
-		Event event = settings.getEvent(id);
-
-//		Check if task is already running, if so interrupt
-		Future<?> future = tasks.get(id);
-		if (future != null && future.cancel(true)) {
-			return;
-		}
-
-		switch (event.getType()) {
-			case "binder":
-				future = executor.submit(() -> binderRun(event));
-				break;
-			case "writer":
-				writerRun(event);
-				break;
-			case "custom":
-				customRun(event);
-				break;
-			default:
-				System.out.println("Sorry, not supported yet!");
-		}
-		tasks.put(id, future);
-	}
-
-	private void binderRun(Event event) {
-		int delay = 0;
-		char[] keys;
-		int pos = event.getAction().indexOf(";");
-		if (pos != -1) {
-			delay = Integer.parseInt(event.getAction().substring(pos + 1));
-			keys = event.getAction().substring(0, pos).toCharArray();
-		} else {
-			keys = event.getAction().toCharArray();
-		}
-		do {
-			Platform.runLater(() -> {
-				for (char key : keys) {
-					robot.keyPress(Character.toUpperCase(key));
-					robot.keyRelease(Character.toUpperCase(key));
-				}
-			});
-			try {
-				TimeUnit.SECONDS.sleep(delay);
-			} catch (InterruptedException e) {
-				break;
-			}
-		} while (delay != 0);
-	}
-
-	private void writerRun(Event event) {
-		Platform.runLater(() -> {
-			Utils.writeToClipboard(event.getAction());
-
-			robot.keyPress(KeyEvent.VK_ENTER);
-			robot.keyRelease(KeyEvent.VK_ENTER);
-
-			robot.keyPress(KeyEvent.VK_CONTROL);
-			robot.keyPress(KeyEvent.VK_V);
-			robot.keyRelease(KeyEvent.VK_V);
-			robot.keyRelease(KeyEvent.VK_CONTROL);
-
-			robot.keyPress(KeyEvent.VK_ENTER);
-			robot.keyRelease(KeyEvent.VK_ENTER);
-		});
-	}
-
-	private void customRun(Event event) {
+		int[] cId = Utils.parseUId(PoeHelperApplication.eventHeap.get(id));
+		settings.getFeature(cId[0]).run(cId[1]);
 	}
 
 	@PreDestroy
 	public void cleanUp() {
 		hook.stop();
-		if (robot != null) {
-			robot.destroy();
+		if (ROBOT != null) {
+			ROBOT.get().destroy();
 		}
 		executor.shutdownNow();
 		whTh.interrupt();
-		whTh = null;
 	}
 
 	private class WindowSwitchHook implements WinUser.WindowProc, Runnable {
@@ -189,16 +121,15 @@ public class Runner {
 		}
 
 		private void registerHotkeys() {
-			for (int i = 0; i < settings.getEventsSize(); i++) {
-				if (settings.getEvent(i).getEnabled())
-					JIntellitype.getInstance().registerHotKey(i, settings.getEvent(i).getHotKey());
+			for (int i = 0; i < PoeHelperApplication.eventHeap.size(); i++) {
+				int[] uId = Utils.parseUId(PoeHelperApplication.eventHeap.get(i));
+				JIntellitype.getInstance().registerHotKey(i, settings.getEvent(uId[0], uId[1]).getHotKey());
 			}
 		}
 
 		private void unregisterHotkeys() {
-			for (int i = 0; i < settings.getEventsSize(); i++) {
-				if (settings.getEvent(i).getEnabled())
-					JIntellitype.getInstance().unregisterHotKey(i);
+			for (int i = 0; i < PoeHelperApplication.eventHeap.size(); i++) {
+				JIntellitype.getInstance().unregisterHotKey(i);
 			}
 		}
 	}

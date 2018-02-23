@@ -66,6 +66,14 @@ public class Utils {
 		return Native.toString(buffer);
 	}
 
+	public static int[] parseUId(String uId) {
+		String[] cId = uId.split(":");
+		int[] result = new int[2];
+		result[0] = Integer.parseInt(cId[0]);
+		result[1] = Integer.parseInt(cId[1]);
+		return result;
+	}
+
 	public static String writeToClipboard(String text) {
 		Clipboard clipboard = Clipboard.getSystemClipboard();
 		String result = clipboard.getString();

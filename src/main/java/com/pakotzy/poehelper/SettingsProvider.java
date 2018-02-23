@@ -1,5 +1,7 @@
 package com.pakotzy.poehelper;
 
+import com.pakotzy.poehelper.event.Event;
+import com.pakotzy.poehelper.feature.Feature;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.DumperOptions;
@@ -14,43 +16,38 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @ConfigurationProperties
+//@Validated
 public class SettingsProvider {
 	private final Path configPath = Paths.get(System.getProperty("user.home") + "/Documents/POEHelper/settings.yml");
+	//	@NotNull
+	private List<Feature> settings;
 
-	private List<Event> events = new ArrayList<>();
-
-	public SettingsProvider(List<Event> events) {}
-
-	public List<Event> getEvents() {
-		return events;
+	public List<Feature> getSettings() {
+		return settings;
 	}
 
-	public Event getEvent(int eventId) {
-		return events.get(eventId);
+	public void setSettings(List<Feature> settings) {
+		this.settings = settings;
 	}
 
-	public int addEvent(Event event) {
-		events.add(event);
-		return getEventsSize() - 1;
+	public Feature getFeature(int i) {
+		return settings.get(i);
 	}
 
-	public int getEventsSize() {
-		return events.size();
+	public Event getEvent(int fId, int eId) {
+		return settings.get(fId).getEvent(eId);
 	}
 
 	@PostConstruct
-	public void loadCustomConfig() {
+	public void loadCustomConfig() throws IOException {
 		if (Files.exists(configPath)) {
 			try (BufferedReader reader = Files.newBufferedReader(configPath)) {
 				Yaml yaml = new Yaml();
-				events = yaml.load(reader);
-			} catch (IOException e) {
-				e.printStackTrace();
+				settings = yaml.load(reader);
 			}
 		}
 	}
@@ -65,7 +62,7 @@ public class SettingsProvider {
 
 		try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
 			Yaml yaml = new Yaml();
-			writer.append(yaml.dumpAs(events, Tag.SEQ, DumperOptions.FlowStyle.BLOCK));
+			writer.append(yaml.dumpAs(settings, Tag.SEQ, DumperOptions.FlowStyle.BLOCK));
 		}
 	}
 }
