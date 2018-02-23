@@ -4,10 +4,11 @@ import com.pakotzy.poehelper.PoeHelperApplication;
 import com.pakotzy.poehelper.event.Event;
 import javafx.scene.control.TitledPane;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public abstract class Feature {
-	//	@Valid
+	@Valid
 	private List<Event> events;
 
 	private int fId;

@@ -15,11 +15,11 @@ settings:
     action: /disconnect
     hotKey: SHIFT+Q
     enabled: true
-#- !!com.pakotzy.poehelper.feature.Crafter
-#  events:
-#  - !!com.pakotzy.poehelper.event.CrafterEvent
-#    hotKey: SHIFT+S
-#    enabled: false
-#    links: 6
-#    sockets: 6
-#    colors: R-B-G-R G-B
+- !!com.pakotzy.poehelper.feature.Crafter
+  events:
+  - !!com.pakotzy.poehelper.event.CrafterEvent
+    hotKey: SHIFT+S
+    enabled: false
+    links: 6
+    sockets: 6
+    colors: R-B-G-R G-B

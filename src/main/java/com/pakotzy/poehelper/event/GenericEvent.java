@@ -1,8 +1,6 @@
 package com.pakotzy.poehelper.event;
 
-//@Validated
 public class GenericEvent extends Event {
-	//	@NotNull
 	private String action;
 
 	public String getAction() {

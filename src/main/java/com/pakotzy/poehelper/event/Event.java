@@ -1,9 +1,7 @@
 package com.pakotzy.poehelper.event;
 
 public class Event {
-	//	@NotNull
 	private String hotKey;
-	//	@NotNull
 	private boolean enabled;
 
 	public String getHotKey() {

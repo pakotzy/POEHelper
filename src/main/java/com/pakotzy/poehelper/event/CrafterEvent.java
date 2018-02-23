@@ -1,13 +1,16 @@
 package com.pakotzy.poehelper.event;
 
-//@Validated
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 public class CrafterEvent extends Event {
-	//	@Max(6)
+	@Max(6)
 	private int links;
-	//	@Max(6)
+	@Max(6)
 	private int sockets;
-	//	@Size(min = 1, max = 11)
-//	@Pattern(regexp = "^(([RGB])([ -][RGB])*)$")
+	@Size(max = 11)
+	@Pattern(regexp = "^(([RGB])([ -][RGB])*)$")
 	private String colors;
 
 	public int getLinks() {

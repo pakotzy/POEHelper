@@ -4,12 +4,14 @@ import com.pakotzy.poehelper.event.Event;
 import com.pakotzy.poehelper.feature.Feature;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.Tag;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.validation.Valid;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -20,10 +22,11 @@ import java.util.List;
 
 @Component
 @ConfigurationProperties
-//@Validated
+@Validated
 public class SettingsProvider {
 	private final Path configPath = Paths.get(System.getProperty("user.home") + "/Documents/POEHelper/settings.yml");
-	//	@NotNull
+
+	@Valid
 	private List<Feature> settings;
 
 	public List<Feature> getSettings() {
