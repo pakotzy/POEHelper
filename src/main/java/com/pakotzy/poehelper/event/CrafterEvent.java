@@ -1,17 +1,18 @@
 package com.pakotzy.poehelper.event;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 public class CrafterEvent extends Event {
 	@Max(6)
 	private int links;
 	@Max(6)
 	private int sockets;
-	@Size(max = 11)
-	@Pattern(regexp = "^(([RGB])([ -][RGB])*)$")
-	private String colors;
+	@Max(6)
+	private int r;
+	@Max(6)
+	private int g;
+	@Max(6)
+	private int b;
 
 	public int getLinks() {
 		return links;
@@ -21,30 +22,39 @@ public class CrafterEvent extends Event {
 		this.links = links;
 	}
 
+	public int getR() {
+		return r;
+	}
+
+	public void setR(int r) {
+		this.r = r;
+	}
+
+	public int getG() {
+		return g;
+	}
+
+	public void setG(int g) {
+		this.g = g;
+	}
+
+	public int getB() {
+		return b;
+	}
+
+	public void setB(int b) {
+		this.b = b;
+	}
+
+	public int getColorsSum() {
+		return r + g + b;
+	}
+
 	public int getSockets() {
 		return sockets;
 	}
 
 	public void setSockets(int sockets) {
 		this.sockets = sockets;
-	}
-
-	public String getColors() {
-		return colors;
-	}
-
-	public void setColors(String colors) {
-		this.colors = colors;
-	}
-
-	@Override
-	public String toString() {
-		return "CrafterEvent{" +
-				"hotKey=" + getHotKey() +
-				", links=" + links +
-				", sockets=" + sockets +
-				", colors='" + colors +
-				", enabled=" + isEnabled() + '\'' +
-				'}';
 	}
 }

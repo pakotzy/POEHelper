@@ -2,7 +2,7 @@ settings:
 - !!com.pakotzy.poehelper.feature.Binder
   events:
   - !!com.pakotzy.poehelper.event.GenericEvent
-    hotKey: C
+    hotKey: Shift+C
     action: QERT;4
     enabled: true
 - !!com.pakotzy.poehelper.feature.Writer
@@ -15,11 +15,3 @@ settings:
     action: /disconnect
     hotKey: SHIFT+Q
     enabled: true
-- !!com.pakotzy.poehelper.feature.Crafter
-  events:
-  - !!com.pakotzy.poehelper.event.CrafterEvent
-    hotKey: SHIFT+S
-    enabled: false
-    links: 6
-    sockets: 6
-    colors: R-B-G-R G-B

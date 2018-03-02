@@ -157,7 +157,7 @@ public class Binder extends Feature {
 			keys = event.getAction().toCharArray();
 		}
 		do {
-			Platform.runLater(() -> {
+			Utils.executeOnEventThread(() -> {
 				for (char key : keys) {
 					Runner.ROBOT.get().keyPress(Character.toUpperCase(key));
 					Runner.ROBOT.get().keyRelease(Character.toUpperCase(key));
