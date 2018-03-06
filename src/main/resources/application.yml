@@ -5,6 +5,14 @@ settings:
     hotKey: Shift+C
     action: QERT;4
     enabled: true
+  - !!com.pakotzy.poehelper.event.GenericEvent
+    hotKey: Ctrl+Up
+    action: "+"
+    enabled: true
+  - !!com.pakotzy.poehelper.event.GenericEvent
+    hotKey: Ctrl+Down
+    action: "-"
+    enabled: true
 - !!com.pakotzy.poehelper.feature.Writer
   events:
   - !!com.pakotzy.poehelper.event.GenericEvent

@@ -9,8 +9,11 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
@@ -18,10 +21,11 @@ public class Runner {
 	public static final AtomicReference<Robot> ROBOT = new AtomicReference<>();
 
 	static {
-		Platform.runLater(() -> ROBOT.set(Application.GetApplication().createRobot()));
+		Utils.executeOnEventThread(() -> ROBOT.set(Application.GetApplication().createRobot()));
 	}
 
 	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private final Map<Integer, Future<?>> tasks = new HashMap<>();
 	private final WindowSwitchHook hook = new WindowSwitchHook();
 
 	private SettingsProvider settings;
@@ -36,10 +40,16 @@ public class Runner {
 	}
 
 	public void run(int id) {
-		Platform.runLater(() -> ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
+		Utils.executeOnEventThread(() -> ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
 
 		int[] cId = Utils.parseUId(PoeHelperApplication.eventHeap.get(id));
-		settings.getFeature(cId[0]).run(cId[1]);
+		Future<?> future = tasks.get(id);
+		if (future != null && future.cancel(true)) {
+			future = executor.submit(() -> settings.getFeature(cId[0]).stop(cId[1]));
+		} else {
+			future = executor.submit(() -> settings.getFeature(cId[0]).run(cId[1]));
+		}
+		tasks.put(id, future);
 	}
 
 	@PreDestroy

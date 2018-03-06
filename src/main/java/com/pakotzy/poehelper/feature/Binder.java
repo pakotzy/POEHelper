@@ -16,16 +16,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class Binder extends Feature {
-	private final ExecutorService executor = Executors.newCachedThreadPool();
-	private final Map<Integer, Future<?>> tasks = new HashMap<>();
 
 	@Override
 	public TitledPane draw() {
@@ -136,17 +129,6 @@ public class Binder extends Feature {
 	public void run(Integer id) {
 		GenericEvent event = (GenericEvent) getEvent(id);
 
-//		Check if task is already running, if so interrupt
-		Future<?> future = tasks.get(id);
-		if (future != null && future.cancel(true)) {
-			return;
-		} else {
-			future = executor.submit(() -> execute(event));
-			tasks.put(id, future);
-		}
-	}
-
-	private void execute(GenericEvent event) {
 		int delay = 0;
 		char[] keys;
 		int pos = event.getAction().indexOf(";");
@@ -156,16 +138,32 @@ public class Binder extends Feature {
 		} else {
 			keys = event.getAction().toCharArray();
 		}
+
 		do {
-			Utils.executeOnEventThread(() -> {
-				for (char key : keys) {
-					Runner.ROBOT.get().keyPress(Character.toUpperCase(key));
-					Runner.ROBOT.get().keyRelease(Character.toUpperCase(key));
+			if (keys.length == 1) {
+				if (keys[0] == '+' || keys[0] == '-') {
+					Utils.lowLevelKeyboardDown(keys[0]);
+					try {
+						TimeUnit.SECONDS.sleep(5);
+					} catch (InterruptedException e) {
+						System.out.println("Interrupted be the user!");
+					} finally {
+						Utils.lowLevelKeyboardUp(keys[0]);
+					}
 				}
-			});
+			} else {
+				Utils.executeOnEventThread(() -> {
+					for (char key : keys) {
+						Runner.ROBOT.get().keyPress(Character.toUpperCase(key));
+						Runner.ROBOT.get().keyRelease(Character.toUpperCase(key));
+					}
+				});
+			}
+
 			try {
 				TimeUnit.SECONDS.sleep(delay);
 			} catch (InterruptedException e) {
+				System.out.println("Interrupted by the user!");
 				break;
 			}
 		} while (delay != 0);
@@ -173,7 +171,11 @@ public class Binder extends Feature {
 
 	@Override
 	public void stop(Integer id) {
+		GenericEvent event = (GenericEvent) getEvent(id);
+		String action = event.getAction();
 
+		if (action.length() == 1)
+			Utils.lowLevelKeyboardUp(action.charAt(0));
 	}
 
 	@Override
