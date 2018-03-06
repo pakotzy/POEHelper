@@ -26,7 +26,7 @@ settings:
 - !!com.pakotzy.poehelper.feature.Crafter
   events:
   - !!com.pakotzy.poehelper.event.CrafterEvent
-    hotKey: Control+Shift+L
+    hotKey: Control+L
     enabled: true
     links: 2
     sockets: 0
