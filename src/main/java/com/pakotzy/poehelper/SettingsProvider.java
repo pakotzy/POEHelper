@@ -45,6 +45,11 @@ public class SettingsProvider {
 		return settings.get(fId).getEvent(eId);
 	}
 
+	public Event getEvent(int gId) {
+		int[] cId = Utils.parseUId(PoeHelperApplication.eventHeap.get(gId));
+		return getEvent(cId[0], cId[1]);
+	}
+
 	@PostConstruct
 	public void loadCustomConfig() throws IOException {
 		if (Files.exists(configPath)) {

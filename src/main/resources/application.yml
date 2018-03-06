@@ -6,20 +6,30 @@ settings:
     action: QERT;4
     enabled: true
   - !!com.pakotzy.poehelper.event.GenericEvent
-    hotKey: Ctrl+Up
+    hotKey: Control+Up
     action: "+"
     enabled: true
   - !!com.pakotzy.poehelper.event.GenericEvent
-    hotKey: Ctrl+Down
+    hotKey: Control+Down
     action: "-"
     enabled: true
 - !!com.pakotzy.poehelper.feature.Writer
   events:
   - !!com.pakotzy.poehelper.event.GenericEvent
     action: /afk Wife's home. On duty!
-    hotKey: SHIFT+S
+    hotKey: Shift+S
     enabled: true
   - !!com.pakotzy.poehelper.event.GenericEvent
     action: /disconnect
-    hotKey: SHIFT+Q
+    hotKey: Shift+Q
     enabled: true
+- !!com.pakotzy.poehelper.feature.Crafter
+  events:
+  - !!com.pakotzy.poehelper.event.CrafterEvent
+    hotKey: Control+Shift+L
+    enabled: true
+    links: 2
+    sockets: 0
+    r: 2
+    g: 0
+    b: 0

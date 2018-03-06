@@ -4,11 +4,9 @@ import com.melloware.jintellitype.JIntellitype;
 import com.sun.glass.ui.Application;
 import com.sun.glass.ui.Robot;
 import com.sun.jna.platform.win32.*;
-import javafx.application.Platform;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
-import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -20,10 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Runner {
 	public static final AtomicReference<Robot> ROBOT = new AtomicReference<>();
 
-	static {
-		Utils.executeOnEventThread(() -> ROBOT.set(Application.GetApplication().createRobot()));
-	}
-
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final Map<Integer, Future<?>> tasks = new HashMap<>();
 	private final WindowSwitchHook hook = new WindowSwitchHook();
@@ -32,18 +26,18 @@ public class Runner {
 	private Thread whTh;
 
 	public Runner(SettingsProvider settings) {
-		Platform.runLater(() -> ROBOT.set(Application.GetApplication().createRobot()));
-		this.settings = settings;
-
+		Utils.executeOnEventThread(() -> ROBOT.set(Application.GetApplication().createRobot()));
 		whTh = new Thread(hook);
 		whTh.start();
+		this.settings = settings;
 	}
 
 	public void run(int id) {
-		Utils.executeOnEventThread(() -> ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
+		Future<?> future = tasks.get(id);
 
 		int[] cId = Utils.parseUId(PoeHelperApplication.eventHeap.get(id));
-		Future<?> future = tasks.get(id);
+
+		//	Check if task is already running, if so interrupt and call stop method
 		if (future != null && future.cancel(true)) {
 			future = executor.submit(() -> settings.getFeature(cId[0]).stop(cId[1]));
 		} else {
@@ -132,8 +126,7 @@ public class Runner {
 
 		private void registerHotkeys() {
 			for (int i = 0; i < PoeHelperApplication.eventHeap.size(); i++) {
-				int[] uId = Utils.parseUId(PoeHelperApplication.eventHeap.get(i));
-				JIntellitype.getInstance().registerHotKey(i, settings.getEvent(uId[0], uId[1]).getHotKey());
+				JIntellitype.getInstance().registerHotKey(i, settings.getEvent(i).getHotKey());
 			}
 		}
 

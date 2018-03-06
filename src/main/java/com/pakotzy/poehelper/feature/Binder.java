@@ -145,8 +145,8 @@ public class Binder extends Feature {
 					Utils.lowLevelKeyboardDown(keys[0]);
 					try {
 						TimeUnit.SECONDS.sleep(5);
-					} catch (InterruptedException e) {
-						System.out.println("Interrupted be the user!");
+					} catch (InterruptedException ignored) {
+
 					} finally {
 						Utils.lowLevelKeyboardUp(keys[0]);
 					}
@@ -163,7 +163,6 @@ public class Binder extends Feature {
 			try {
 				TimeUnit.SECONDS.sleep(delay);
 			} catch (InterruptedException e) {
-				System.out.println("Interrupted by the user!");
 				break;
 			}
 		} while (delay != 0);

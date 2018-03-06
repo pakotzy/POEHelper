@@ -4,29 +4,20 @@ import com.pakotzy.poehelper.Runner;
 import com.pakotzy.poehelper.Utils;
 import com.pakotzy.poehelper.event.CrafterEvent;
 import com.sun.glass.ui.Robot;
-import javafx.application.Platform;
 import javafx.scene.control.TitledPane;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Crafter extends Feature {
-	private final ExecutorService executor = Executors.newCachedThreadPool();
-	private final Map<Integer, Future<?>> tasks = new HashMap<>();
-
 	/*
 	 * Number of links
 	 * (?:\s|^)[RGB](?:[-][RGB]){1}(?=\s|$)
 	 *
 	 * Number of sockets
-	 * ^[RGB](?:[ -][RGB]){5}$
+	 * ^[RGB](?:[ -][RGB]){5}[ $]
 	 *
 	 * Needed colors
 	 *^(?=(?:.*?R){1})(?=(?:.*?G){1})(?=(?:.*?B){2}).{1,11}$
@@ -42,70 +33,56 @@ public class Crafter extends Feature {
 	public void run(Integer id) {
 		CrafterEvent event = (CrafterEvent) getEvent(id);
 
-//		Check if task is already running, if so interrupt
-		Future<?> future = tasks.get(id);
-		if (future != null && future.cancel(true)) {
-			System.out.println("Stopped");
-			Platform.runLater(() -> Runner.ROBOT.get().keyRelease(KeyEvent.VK_CONTROL));
-			return;
-		} else {
-			System.out.println("Starting");
-//			Platform.runLater(() -> Runner.ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
-			future = executor.submit(() -> execute(event));
-			tasks.put(id, future);
-		}
-	}
-
-	private void execute(CrafterEvent event) {
 		ArrayList<Pattern> patterns = new ArrayList<>();
 		// Find line
 		patterns.add(Pattern.compile("(?:Sockets: )((?:[RGB][ -]){0,5})", Pattern.MULTILINE));
 		// Find sockets
 		if (event.getSockets() > 0)
-			patterns.add(Pattern.compile(String.format("(^[RGB](?:[ -][RGB]){%d}$)", event.getSockets() - 1)));
+			patterns.add(Pattern.compile(String.format("(^[RGB](?:[ -][RGB]){%d,}[ $])", event.getSockets() - 1)));
 		// Find links
-		if (event.getLinks() > 0)
-			patterns.add(Pattern.compile(String.format("((?:\\s|^)[RGB](?:[-][RGB]){%d}(?=\\s|$))", event.getLinks()
-					- 1)));
+		if (event.getLinks() > 0) {
+			patterns.add(Pattern.compile(String.format("((?:\\s|^)[RGB](?:[-][RGB]){%d,}(?=\\s|$))",
+					event.getLinks() - 1)));
+		}
 		// Find colors
 		if (event.getColorsSum() > 0)
 			patterns.add(Pattern.compile(String.format("(^(?=(?:.*?R){%d})(?=(?:.*?G){%d})(?=(?:.*?B){%d}).{1,11}$)",
 					event.getR(), event.getG(), event.getB())));
 
+		Utils.executeOnEventThread(() -> Utils.writeToClipboard("Starting writer"));
+		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyPress(KeyEvent.VK_SHIFT));
+
 		while (true) {
-			Utils.executeOnEventThread(() -> {
-				Runner.ROBOT.get().keyPress(KeyEvent.VK_CONTROL);
-				Runner.ROBOT.get().keyPress(KeyEvent.VK_C);
-				Runner.ROBOT.get().keyRelease(KeyEvent.VK_C);
-				System.out.println("Copied to the Clipboard");
-				return Boolean.TRUE;
-			});
-			String old = Utils.executeOnEventThread(Utils::readFromClipboard);
+			String oldItem = Utils.executeOnEventThread(Utils::readFromClipboard);
 
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			String item = oldItem;
+			while (item.equals(oldItem)) {
+				item = Utils.executeOnEventThread(() -> {
+					Runner.ROBOT.get().keyPress(KeyEvent.VK_CONTROL);
+					Runner.ROBOT.get().keyPress(KeyEvent.VK_C);
+					Runner.ROBOT.get().keyRelease(KeyEvent.VK_C);
+					Runner.ROBOT.get().keyRelease(KeyEvent.VK_CONTROL);
 
-			String item = Utils.executeOnEventThread(Utils::readFromClipboard);
+					return Utils.readFromClipboard();
+				});
 
-			if (!old.equals(item)) {
-				System.out.println("Not good");
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					return;
+				}
 			}
 
 			if (match(item, patterns))
 				break;
 
-			Platform.runLater(() -> {
+			Utils.executeOnEventThread(() -> {
 				Runner.ROBOT.get().mousePress(Robot.MOUSE_LEFT_BTN);
 				Runner.ROBOT.get().mouseRelease(Robot.MOUSE_LEFT_BTN);
 			});
-
-			break;
 		}
 
-		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyRelease(KeyEvent.VK_CONTROL));
+		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
 	}
 
 	private boolean match(String item, ArrayList<Pattern> patterns) {
@@ -122,9 +99,8 @@ public class Crafter extends Feature {
 			}
 		}
 		return true;
-	}
 
-	/*
+		/*
 			Rarity: Rare
 			Foe Beak
 			Siege Axe
@@ -154,10 +130,11 @@ public class Crafter extends Feature {
 			13% reduced Enemy Stun Threshold
 					--------
 			Note: ~price 1 chaos
-			*/
+		*/
+	}
 
 	@Override
 	public void stop(Integer id) {
-
+		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
 	}
 }

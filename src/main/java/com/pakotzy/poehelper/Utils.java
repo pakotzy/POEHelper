@@ -58,14 +58,14 @@ public class Utils {
 		List<String> result = new ArrayList<>();
 
 		if (keyEvent.isAltDown()) result.add("Alt");
-		if (keyEvent.isControlDown()) result.add("Ctrl");
+		if (keyEvent.isControlDown()) result.add("Control");
 		if (keyEvent.isShiftDown()) result.add("Shift");
 
 		String keyCode = keyEvent.getCode().getName();
 
 		switch (keyCode) {
 			case "Alt":
-			case "Ctrl":
+			case "Control":
 			case "Shift":
 				break;
 			default:
@@ -94,23 +94,17 @@ public class Utils {
 		ClipboardContent content = new ClipboardContent();
 		content.putString(text);
 		clipboard.setContent(content);
-//		TODO Make this stupid Clipboard to not block Robot events, so i can restore Clipboard contents
+		//		TODO Make this stupid Clipboard to not block Robot events, so i can restore Clipboard contents
 	}
 
 	public static String readFromClipboard() {
-		Clipboard clipboard = Clipboard.getSystemClipboard();
-		String result = "Not text on the clipboard";
-		if (clipboard.hasString())
-			result = clipboard.getString();
-		System.out.println(result);
-		return result;
+		return Clipboard.getSystemClipboard().getString();
 	}
 
 	public static <T> T executeOnEventThread(Supplier<T> fn) {
 		AtomicReference<T> result = new AtomicReference<>();
-		T before = result.get();
 		Platform.runLater(() -> result.set(fn.get()));
-		while (result.compareAndSet(before, before)) ;
+		while (result.compareAndSet(null, null)) ;
 		return result.get();
 	}
 
@@ -127,8 +121,10 @@ public class Utils {
 			input.input.ki.dwFlags = new WinDef.DWORD(SCANCODE);
 			WinDef.DWORD inserted = user32.SendInput(new WinDef.DWORD(1), (WinUser.INPUT[]) input.toArray(1),
 					input.size());
-			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardDown - %c" : "\nlowLevelKeyboardDown - " +
-					"%c " +
+			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardDown - '%c'" : "\nlowLevelKeyboardDown " +
+					"-" +
+					" " +
+					"'%c' " +
 					"unsuccessful"), c);
 		} else {
 			System.out.println("No such special key");
@@ -144,7 +140,9 @@ public class Utils {
 			input.input.ki.dwFlags = new WinDef.DWORD(SCANCODE | RELEASED);
 			WinDef.DWORD inserted = user32.SendInput(new WinDef.DWORD(1), (WinUser.INPUT[]) input.toArray(1),
 					input.size());
-			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardUp - %c" : "\nlowLevelKeyboardUp - %c " +
+			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardUp - '%c'" : "\nlowLevelKeyboardUp - " +
+					"'%c'" +
+					" " +
 					"unsuccessful"), c);
 		} else {
 			System.out.println("No such special key");
