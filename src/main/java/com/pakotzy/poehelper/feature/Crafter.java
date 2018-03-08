@@ -8,6 +8,7 @@ import javafx.scene.control.TitledPane;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +54,7 @@ public class Crafter extends Feature {
 		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyPress(KeyEvent.VK_SHIFT));
 
 		while (true) {
+			System.out.println("Working");
 			String oldItem = Utils.executeOnEventThread(Utils::readFromClipboard);
 
 			String item = oldItem;
@@ -67,8 +69,10 @@ public class Crafter extends Feature {
 				});
 
 				try {
-					Thread.sleep(50);
+					// TODO too hard to interrupt this timeout
+					TimeUnit.MILLISECONDS.sleep(50);
 				} catch (InterruptedException e) {
+					System.out.println("Interrupting");
 					return;
 				}
 			}
@@ -93,8 +97,6 @@ public class Crafter extends Feature {
 			if (m.find()) {
 				item = m.group(1);
 			} else {
-				System.out.println("Not found " + p.pattern());
-				System.out.println(item);
 				return false;
 			}
 		}

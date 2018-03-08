@@ -121,11 +121,12 @@ public class Utils {
 			input.input.ki.dwFlags = new WinDef.DWORD(SCANCODE);
 			WinDef.DWORD inserted = user32.SendInput(new WinDef.DWORD(1), (WinUser.INPUT[]) input.toArray(1),
 					input.size());
-			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardDown - '%c'" : "\nlowLevelKeyboardDown " +
-					"-" +
-					" " +
-					"'%c' " +
-					"unsuccessful"), c);
+			//			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardDown - '%c'" :
+			// "\nlowLevelKeyboardDown " +
+			//					"-" +
+			//					" " +
+			//					"'%c' " +
+			//					"unsuccessful"), c);
 		} else {
 			System.out.println("No such special key");
 		}
@@ -140,10 +141,11 @@ public class Utils {
 			input.input.ki.dwFlags = new WinDef.DWORD(SCANCODE | RELEASED);
 			WinDef.DWORD inserted = user32.SendInput(new WinDef.DWORD(1), (WinUser.INPUT[]) input.toArray(1),
 					input.size());
-			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardUp - '%c'" : "\nlowLevelKeyboardUp - " +
-					"'%c'" +
-					" " +
-					"unsuccessful"), c);
+			//			System.out.printf((inserted.intValue() == 1 ? "\nlowLevelKeyboardUp - '%c'" :
+			// "\nlowLevelKeyboardUp - " +
+			//					"'%c'" +
+			//					" " +
+			//					"unsuccessful"), c);
 		} else {
 			System.out.println("No such special key");
 		}

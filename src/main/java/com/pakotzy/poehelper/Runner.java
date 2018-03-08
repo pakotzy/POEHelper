@@ -1,12 +1,14 @@
 package com.pakotzy.poehelper;
 
 import com.melloware.jintellitype.JIntellitype;
+import com.pakotzy.poehelper.event.Event;
 import com.sun.glass.ui.Application;
 import com.sun.glass.ui.Robot;
 import com.sun.jna.platform.win32.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -26,16 +28,34 @@ public class Runner {
 	private Thread whTh;
 
 	public Runner(SettingsProvider settings) {
-		Utils.executeOnEventThread(() -> ROBOT.set(Application.GetApplication().createRobot()));
 		whTh = new Thread(hook);
 		whTh.start();
 		this.settings = settings;
 	}
 
 	public void run(int id) {
+		if (ROBOT.get() == null) {
+			Utils.executeOnEventThread(() -> ROBOT.set(Application.GetApplication().createRobot()));
+		}
+
+		try {
+			Class keyCode = Class.forName("java.awt.event.KeyEvent");
+			Event event = settings.getEvent(id);
+			String[] mods = event.getHotKey().split("\\+");
+			for (String mod : mods) {
+				Field field = keyCode.getDeclaredField("VK_" + mod.toUpperCase());
+				Integer code = (Integer) field.get(keyCode);
+				Utils.executeOnEventThread(() -> ROBOT.get().keyRelease(code));
+			}
+
+		} catch (Exception ex) {
+			System.out.println("oops");
+		}
+
 		Future<?> future = tasks.get(id);
 
 		int[] cId = Utils.parseUId(PoeHelperApplication.eventHeap.get(id));
+		//		System.out.printf("Run - %d = %d -> %d\n", id, cId[0], cId[1]);
 
 		//	Check if task is already running, if so interrupt and call stop method
 		if (future != null && future.cancel(true)) {

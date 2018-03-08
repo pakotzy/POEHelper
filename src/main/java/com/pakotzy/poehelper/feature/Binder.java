@@ -140,16 +140,14 @@ public class Binder extends Feature {
 		}
 
 		do {
-			if (keys.length == 1) {
-				if (keys[0] == '+' || keys[0] == '-') {
-					Utils.lowLevelKeyboardDown(keys[0]);
-					try {
-						TimeUnit.SECONDS.sleep(5);
-					} catch (InterruptedException ignored) {
+			if (keys[0] == '+' || keys[0] == '-') {
+				Utils.lowLevelKeyboardDown(keys[0]);
+				try {
+					TimeUnit.SECONDS.sleep(5);
+				} catch (InterruptedException ignored) {
 
-					} finally {
-						Utils.lowLevelKeyboardUp(keys[0]);
-					}
+				} finally {
+					Utils.lowLevelKeyboardUp(keys[0]);
 				}
 			} else {
 				Utils.executeOnEventThread(() -> {
