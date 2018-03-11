@@ -150,4 +150,8 @@ public class Utils {
 			System.out.println("No such special key");
 		}
 	}
+
+	public static short getKeyState(int vKeyCode) {
+		return user32.GetAsyncKeyState(vKeyCode);
+	}
 }

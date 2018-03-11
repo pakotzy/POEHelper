@@ -49,7 +49,7 @@ public class Runner {
 			}
 
 		} catch (Exception ex) {
-			System.out.println("oops");
+			ex.printStackTrace();
 		}
 
 		Future<?> future = tasks.get(id);

@@ -54,7 +54,6 @@ public class Crafter extends Feature {
 		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyPress(KeyEvent.VK_SHIFT));
 
 		while (true) {
-			System.out.println("Working");
 			String oldItem = Utils.executeOnEventThread(Utils::readFromClipboard);
 
 			String item = oldItem;
@@ -69,16 +68,22 @@ public class Crafter extends Feature {
 				});
 
 				try {
-					// TODO too hard to interrupt this timeout
-					TimeUnit.MILLISECONDS.sleep(50);
+					TimeUnit.MILLISECONDS.sleep(10);
+					//					If shift is not pressed, stop
+					short shiftState = Utils.getKeyState(0x10);
+					if (shiftState == 1 || shiftState == 0) {
+						throw new InterruptedException("Shift is not pressed");
+					}
 				} catch (InterruptedException e) {
 					System.out.println("Interrupting");
 					return;
 				}
 			}
 
-			if (match(item, patterns))
+			if (match(item, patterns)) {
+				System.out.println("Complete");
 				break;
+			}
 
 			Utils.executeOnEventThread(() -> {
 				Runner.ROBOT.get().mousePress(Robot.MOUSE_LEFT_BTN);
@@ -91,12 +96,13 @@ public class Crafter extends Feature {
 
 	private boolean match(String item, ArrayList<Pattern> patterns) {
 		Matcher m;
-
+		int i = 0;
 		for (Pattern p : patterns) {
 			m = p.matcher(item);
 			if (m.find()) {
 				item = m.group(1);
 			} else {
+				//				System.out.println(p.pattern() + " - " + item);
 				return false;
 			}
 		}

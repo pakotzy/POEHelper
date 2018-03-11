@@ -28,8 +28,8 @@ settings:
   - !!com.pakotzy.poehelper.event.CrafterEvent
     hotKey: Control+L
     enabled: true
-    links: 2
-    sockets: 0
-    r: 2
+    links: 0
+    sockets: 5
+    r: 0
     g: 0
     b: 0
