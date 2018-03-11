@@ -69,7 +69,7 @@ public class Crafter extends Feature {
 
 				try {
 					TimeUnit.MILLISECONDS.sleep(10);
-					//					If shift is not pressed, stop
+					// If shift is not pressed, stop
 					short shiftState = Utils.getKeyState(0x10);
 					if (shiftState == 1 || shiftState == 0) {
 						throw new InterruptedException("Shift is not pressed");
@@ -102,7 +102,7 @@ public class Crafter extends Feature {
 			if (m.find()) {
 				item = m.group(1);
 			} else {
-				//				System.out.println(p.pattern() + " - " + item);
+				//	System.out.println(p.pattern() + " - " + item);
 				return false;
 			}
 		}

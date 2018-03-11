@@ -13,6 +13,7 @@ public class Writer extends Binder {
 	public TitledPane draw() {
 		TitledPane result = super.draw();
 		result.setId("writerTitledPane");
+		result.setText("Writer");
 		return result;
 	}
 
