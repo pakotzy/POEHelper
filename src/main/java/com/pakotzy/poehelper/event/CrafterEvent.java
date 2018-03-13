@@ -90,4 +90,12 @@ public class CrafterEvent extends Event {
 		mods.add(element);
 		return mods.size() - 1;
 	}
+
+	public boolean hasSocketsRequirements() {
+		return links > 0 || sockets > 0 || getColorsSum() > 0;
+	}
+
+	public boolean hasModsRequirements() {
+		return mods.size() > 0;
+	}
 }

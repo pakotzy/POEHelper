@@ -278,6 +278,7 @@ public class Crafter extends Feature {
 	public void run(Integer id) {
 		CrafterEvent event = (CrafterEvent) getEvent(id);
 
+//		Compile patterns
 		ArrayList<Pattern> patterns = new ArrayList<>();
 //		Find mods
 //		if ()
@@ -327,7 +328,7 @@ public class Crafter extends Feature {
 				}
 			}
 
-			if (match(item, patterns)) {
+			if (matchAll(item, patterns)) {
 				System.out.println("Complete");
 				break;
 			}
@@ -341,50 +342,37 @@ public class Crafter extends Feature {
 		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyRelease(KeyEvent.VK_SHIFT));
 	}
 
-	private boolean match(String item, ArrayList<Pattern> patterns) {
-		Matcher m;
+	private boolean matchAll(String item, ArrayList<Pattern> patterns) {
+		boolean result = false;
+		ArrayList<String> matches = new ArrayList<>();
+		matches.add(item);
+
 		for (Pattern p : patterns) {
-			m = p.matcher(item);
-			if (m.find()) {
-				item = m.group(1);
+			ArrayList<String> tempMatches = new ArrayList<>();
+			for (String line : matches) {
+				for (String sMatch : matchSingle(line, p)) {
+					tempMatches.add(sMatch);
+				}
+			}
+			if (tempMatches.size() > 0) {
+				result = true;
+				matches = tempMatches;
 			} else {
-//				System.out.println(p.pattern() + " - " + item);
-				return false;
+				result = false;
 			}
 		}
-		return true;
+		return result;
+	}
 
-		/*
-			Rarity: Rare
-			Foe Beak
-			Siege Axe
-			--------
-					One Handed Axe
-			Quality: +19% (augmented)
-					Physical Damage: 57-108 (augmented)
-					Elemental Damage: 36-72 (augmented), 11-165 (augmented)
-					Critical Strike Chance: 5.00%
-					Attacks per Second: 1.50
-			Weapon Range: 9
-					--------
-			Requirements:
-			Level: 59 (unmet)
-					Str: 119 (unmet)
-					Dex: 82 (unmet)
-					--------
-			Sockets: R R-R G-R-R
-					--------
-			Item Level: 74
-					--------
-			Adds 10 to 21 Physical Damage
-			+18 to Strength
-			+25 to Dexterity
-			Adds 36 to 72 Cold Damage
-			Adds 11 to 165 Lightning Damage
-			13% reduced Enemy Stun Threshold
-					--------
-			Note: ~price 1 chaos
-		*/
+	private ArrayList<String> matchSingle(String line, Pattern pattern) {
+		ArrayList<String> result = new ArrayList<>();
+		Matcher m = pattern.matcher(line);
+
+		while (m.find()) {
+			result.add(m.group());
+		}
+
+		return result;
 	}
 
 	@Override
