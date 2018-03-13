@@ -32,9 +32,6 @@ public class Crafter extends Feature {
 
 	@Override
 	public TitledPane draw() {
-		//		TODO Refactor build method - separate creat of each individual control; Add field for hot key, add
-		// enable/disable box, move remove event button up
-
 		TitledPane titledPane = new TitledPane();
 		titledPane.setId("crafterTitledPane");
 		titledPane.setAnimated(false);
@@ -76,7 +73,7 @@ public class Crafter extends Feature {
 			Utils.executeOnEventThread(() -> titledPane.getScene().getWindow().sizeToScene());
 		});
 
-		//		Build header
+//		Build header
 		StringBuilder style = new StringBuilder();
 		style.append(event.getSockets() > 0 ? event.getSockets() + "s; " : "");
 		style.append(event.getLinks() > 0 ? event.getLinks() + "l; " : "");
@@ -86,11 +83,11 @@ public class Crafter extends Feature {
 		style.append(event.getMods().size() > 0 ? event.getMods().size() + "M" : "");
 		titledPane.setText(style.toString());
 
-		//		Main controller
+//		Main controller
 		VBox vBox = new VBox();
 		vBox.setId("vBox" + id);
 
-		//		Controls
+//		Controls
 		HBox controlsHBox = new HBox();
 		controlsHBox.setId("controlsHBox" + id);
 
@@ -134,7 +131,7 @@ public class Crafter extends Feature {
 
 		controlsHBox.getChildren().addAll(keyField, enabledBox, removeButton);
 
-		//		Sockets + Links
+//		Sockets + Links
 		HBox socketsHBox = new HBox();
 		socketsHBox.setId("socketsHBox" + id);
 
@@ -170,7 +167,7 @@ public class Crafter extends Feature {
 
 		socketsHBox.getChildren().addAll(socketsFiled, linksField);
 
-		//		Colors
+//		Colors
 		HBox colorsHBox = new HBox();
 		colorsHBox.setId("colorsHBox" + id);
 
@@ -235,14 +232,14 @@ public class Crafter extends Feature {
 
 		vBox.getChildren().addAll(controlsHBox, socketsHBox, colorsHBox);
 
-		//		Mods
+//		Mods
 		for (int i = 0; i < event.getMods().size(); i++) {
 			HBox modHBox = buildMod(event, i);
 			modHBox.setId("modHBox" + id);
 			vBox.getChildren().add(buildMod(event, i));
 		}
 
-		//		Add
+//		Add
 		Button addButton = new Button("Add modifier");
 		addButton.setId("addButton" + id);
 		addButton.setOnMouseClicked(event1 -> {
@@ -282,19 +279,22 @@ public class Crafter extends Feature {
 		CrafterEvent event = (CrafterEvent) getEvent(id);
 
 		ArrayList<Pattern> patterns = new ArrayList<>();
-		// Find line
-		patterns.add(Pattern.compile("(?:Sockets: )((?:[RGB][ -]){0,5})", Pattern.MULTILINE));
-		// Find sockets
+//		Find mods
+//		if ()
+//		Find line with sockets
+		patterns.add(Pattern.compile("(?:Sockets: )([RGB][ -]?){0,6}", Pattern.MULTILINE));
+//		Find sockets
 		if (event.getSockets() > 0)
 			patterns.add(Pattern.compile(String.format("(^[RGB](?:[ -][RGB]){%d,}[ $])", event.getSockets() - 1)));
-		// Find links
+//		Find links
 		if (event.getLinks() > 0) {
 			patterns.add(Pattern.compile(String.format("((?:\\s|^)[RGB](?:[-][RGB]){%d,}(?=\\s|$))",
 					event.getLinks() - 1)));
 		}
-		// Find colors
+//		Find colors
 		if (event.getColorsSum() > 0 && event.getColorsSum() <= 6)
-			patterns.add(Pattern.compile(String.format("(^(?=(?:.*?R){%d,})(?=(?:.*?G){%d,})(?=(?:.*?B){%d,}).{1,11}$)",
+			patterns.add(Pattern.compile(String.format("(^(?=(?:.*?R){%d,})(?=(?:.*?G){%d,})(?=(?:.*?B){%d,}).{1," +
+							"11}$)",
 					event.getR(), event.getG(), event.getB())));
 
 		Utils.executeOnEventThread(() -> Utils.writeToClipboard("Starting writer"));
@@ -343,13 +343,12 @@ public class Crafter extends Feature {
 
 	private boolean match(String item, ArrayList<Pattern> patterns) {
 		Matcher m;
-		int i = 0;
 		for (Pattern p : patterns) {
 			m = p.matcher(item);
 			if (m.find()) {
 				item = m.group(1);
 			} else {
-				//	System.out.println(p.pattern() + " - " + item);
+//				System.out.println(p.pattern() + " - " + item);
 				return false;
 			}
 		}
