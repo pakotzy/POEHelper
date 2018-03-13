@@ -278,29 +278,40 @@ public class Crafter extends Feature {
 	public void run(Integer id) {
 		CrafterEvent event = (CrafterEvent) getEvent(id);
 
-//		Compile patterns
-		ArrayList<Pattern> patterns = new ArrayList<>();
-//		Find mods
-//		if ()
-//		Find line with sockets
-		patterns.add(Pattern.compile("(?:Sockets: )((?:[RGB][ -]?){0,6})", Pattern.MULTILINE));
-//		Find sockets
-		if (event.getSockets() > 0)
-			patterns.add(Pattern.compile(String.format("(^[RGB](?:[ -][RGB]){%d,}[ $])", event.getSockets() - 1)));
-//		Find links
-		if (event.getLinks() > 0) {
-			patterns.add(Pattern.compile(String.format("((?:\\s|^)[RGB](?:[-][RGB]){%d,}(?=\\s|$))",
-					event.getLinks() - 1)));
+//		Compile modPatterns
+		ArrayList<Pattern> modPatterns = new ArrayList<>();
+		if (event.hasModsRequirements()) {
+			for (String mod : event.getMods())
+				modPatterns.add(Pattern.compile(mod, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
 		}
-//		Find colors
-		if (event.getColorsSum() > 0 && event.getColorsSum() <= 6)
-			patterns.add(Pattern.compile(String.format("(^(?=(?:.*?R){%d,})(?=(?:.*?G){%d,})(?=(?:.*?B){%d,}).{1," +
-							"11}$)",
-					event.getR(), event.getG(), event.getB())));
+
+//		Compile socketPatterns
+		ArrayList<Pattern> socketPatterns = new ArrayList<>();
+		if (event.hasSocketsRequirements()) {
+			//	Find line with sockets
+			socketPatterns.add(Pattern.compile("(?:Sockets: )((?:[RGBW][ -]?){0,6})", Pattern.MULTILINE));
+			//	Find sockets
+			if (event.getSockets() > 0)
+				socketPatterns.add(Pattern.compile(String.format("(^[RGBW](?:[ -][RGBW]){%d,}[ $])", event.getSockets
+						() - 1)));
+
+			//	Find links
+			if (event.getLinks() > 0) {
+				socketPatterns.add(Pattern.compile(String.format("((?:\\s|^)[RGBW](?:[-][RGBW]){%d,}(?=\\s|$))",
+						event.getLinks() - 1)));
+			}
+			//	Find colors
+			if (event.getColorsSum() > 0 && event.getColorsSum() <= 6)
+				socketPatterns.add(Pattern.compile(String.format("(^(?=(?:.*?R){%d,})(?=(?:.*?G){%d,})(?=(?:.*?B){%d," +
+								"}).{1," +
+								"11}$)",
+						event.getR(), event.getG(), event.getB())));
+		}
 
 		Utils.executeOnEventThread(() -> Utils.writeToClipboard("Starting writer"));
 		Utils.executeOnEventThread(() -> Runner.ROBOT.get().keyPress(KeyEvent.VK_SHIFT));
 
+//		Slam
 		while (true) {
 			String oldItem = Utils.executeOnEventThread(Utils::readFromClipboard);
 
@@ -328,7 +339,8 @@ public class Crafter extends Feature {
 				}
 			}
 
-			if (matchAll(item, patterns)) {
+			item = "Sockets: R-G-W-R R-W\nExtra";
+			if (matchAll(item, modPatterns) && matchAll(item, socketPatterns)) {
 				System.out.println("Complete");
 				break;
 			}
@@ -343,7 +355,7 @@ public class Crafter extends Feature {
 	}
 
 	private boolean matchAll(String item, ArrayList<Pattern> patterns) {
-		boolean result = false;
+		boolean result = true;
 		ArrayList<String> matches = new ArrayList<>();
 		matches.add(item);
 
@@ -361,6 +373,7 @@ public class Crafter extends Feature {
 				result = false;
 			}
 		}
+
 		return result;
 	}
 
