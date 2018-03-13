@@ -69,7 +69,7 @@ public class Runner {
 	@PreDestroy
 	public void cleanUp() {
 		hook.stop();
-		if (ROBOT != null) {
+		if (ROBOT.get() != null) {
 			ROBOT.get().destroy();
 		}
 		executor.shutdownNow();

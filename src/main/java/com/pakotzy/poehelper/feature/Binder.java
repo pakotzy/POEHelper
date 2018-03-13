@@ -52,7 +52,6 @@ public class Binder extends Feature {
 	private HBox build(GenericEvent event, int id) {
 		HBox hBox = new HBox();
 		hBox.setId("hBox" + id);
-		hBox.getStyleClass().add("hbox");
 
 		TextField keyField = new TextField(event.getHotKey());
 		keyField.setId("keyField" + id);
@@ -65,7 +64,7 @@ public class Binder extends Feature {
 		actionField.textProperty().addListener(actionChangeListener(event));
 
 		CheckBox enabledBox = new CheckBox();
-		actionField.setId("enabledBox" + id);
+		enabledBox.setId("enabledBox" + id);
 		enabledBox.setIndeterminate(false);
 		enabledBox.setSelected(event.isEnabled());
 		enabledBox.selectedProperty().addListener(enabledChangeListener(event, id));
