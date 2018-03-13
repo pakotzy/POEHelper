@@ -282,7 +282,7 @@ public class Crafter extends Feature {
 //		Find mods
 //		if ()
 //		Find line with sockets
-		patterns.add(Pattern.compile("(?:Sockets: )([RGB][ -]?){0,6}", Pattern.MULTILINE));
+		patterns.add(Pattern.compile("(?:Sockets: )((?:[RGB][ -]?){0,6})", Pattern.MULTILINE));
 //		Find sockets
 		if (event.getSockets() > 0)
 			patterns.add(Pattern.compile(String.format("(^[RGB](?:[ -][RGB]){%d,}[ $])", event.getSockets() - 1)));
