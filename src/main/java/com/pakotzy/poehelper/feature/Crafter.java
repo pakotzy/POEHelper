@@ -289,23 +289,21 @@ public class Crafter extends Feature {
 		ArrayList<Pattern> socketPatterns = new ArrayList<>();
 		if (event.hasSocketsRequirements()) {
 			//	Find line with sockets
-			socketPatterns.add(Pattern.compile("(?:Sockets: )((?:[RGBW][ -]?){0,6})", Pattern.MULTILINE));
+			socketPatterns.add(Pattern.compile("^Sockets: .+$", Pattern.MULTILINE));
 			//	Find sockets
 			if (event.getSockets() > 0)
-				socketPatterns.add(Pattern.compile(String.format("(^[RGBW](?:[ -][RGBW]){%d,}[ $])", event.getSockets
-						() - 1)));
+				socketPatterns.add(Pattern.compile(String.format("[RGBW](?:[ -][RGBW]){%d,}", event.getSockets() -
+						1)));
 
 			//	Find links
 			if (event.getLinks() > 0) {
-				socketPatterns.add(Pattern.compile(String.format("((?:\\s|^)[RGBW](?:[-][RGBW]){%d,}(?=\\s|$))",
-						event.getLinks() - 1)));
+				socketPatterns.add(Pattern.compile(String.format("[RGBW](?:[-][RGBW]){%d,}", event.getLinks() - 1)));
 			}
 			//	Find colors
 			if (event.getColorsSum() > 0 && event.getColorsSum() <= 6)
-				socketPatterns.add(Pattern.compile(String.format("(^(?=(?:.*?R){%d,})(?=(?:.*?G){%d,})(?=(?:.*?B){%d," +
-								"}).{1," +
-								"11}$)",
-						event.getR(), event.getG(), event.getB())));
+				socketPatterns.add(Pattern.compile(String.format("(?=(?:.*?R){%d,})(?=(?:.*?G){%d,})(?=(?:.*?B){%d," +
+								"}).+"
+						, event.getR(), event.getG(), event.getB())));
 		}
 
 		Utils.executeOnEventThread(() -> Utils.writeToClipboard("Starting writer"));
@@ -339,7 +337,7 @@ public class Crafter extends Feature {
 				}
 			}
 
-			item = "Sockets: R-G-W-R R-W\nExtra";
+//			item = "Sockets: R-G-G G-G-G \nExtra";
 			if (matchAll(item, modPatterns) && matchAll(item, socketPatterns)) {
 				System.out.println("Complete");
 				break;
